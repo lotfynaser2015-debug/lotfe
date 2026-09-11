@@ -16,6 +16,8 @@ _price_cache, _price_lock = {}, threading.Lock()
 _meta_cache = {}
 _rpc_locks = {c: threading.Lock() for c in CHAINS}
 _rpc_times = {c: [] for c in CHAINS}
+_rpc_guard_warned = {c: 0.0 for c in CHAINS}
+_latest_block_cache = {c: (0, 0.0) for c in CHAINS}
 
 STABLE_LARGE = {
     "USDT", "USDC", "BUSD", "DAI", "TUSD", "FDUSD", "USDD", "USDP", "FRAX", "LUSD", "MIM", "HAY",
@@ -38,8 +40,10 @@ def rpc(chain_id, method, params):
             times.pop(0)
         # A 24-hour scan can require several getLogs windows plus token metadata.
         # Keep enough headroom while still protecting free public RPC endpoints.
-        if len(times) >= 100:
-            log.warning("RPC rate guard reached for %s; returning no result", chain_id)
+        if len(times) >= 80:
+            if now - _rpc_guard_warned.get(chain_id, 0.0) >= 60:
+                log.warning("RPC rate guard reached for %s; pausing requests until the window clears", chain_id)
+                _rpc_guard_warned[chain_id] = now
             return None
         times.append(now)
     urls = [cfg["rpc"]]
@@ -158,10 +162,13 @@ def transfer_logs(chain_id, address, direction, begin, end):
 
 def transfers_on_chain(chain_id, address, direction, minutes, cap=1200):
     cfg = CHAINS[chain_id]
-    latest_hex = rpc(chain_id, "eth_blockNumber", [])
+    now = time.time()
+    cached_block, cached_at = _latest_block_cache.get(chain_id, (0, 0.0))
+    latest_hex = hex(cached_block) if cached_block and now - cached_at < 15 else rpc(chain_id, "eth_blockNumber", [])
     if not latest_hex:
         return {}
     latest = uint(latest_hex)
+    _latest_block_cache[chain_id] = (latest, now)
     bpm = cfg.get("blocks_per_min", 15)
     # Cap lookback so long windows (12h/24h) don't freeze the bot on free RPCs.
     # Ethereum Mainnet produces roughly 5 blocks per minute.
@@ -423,7 +430,7 @@ def get_clean_opportunity(minutes, wallets=None, chains=None):
     }
 
 
-BEST_WINDOWS = [5, 15, 30, 60]
+BEST_WINDOWS = [5, 30, 60]
 
 
 def get_best_opportunities(wallets=None, chains=None):
