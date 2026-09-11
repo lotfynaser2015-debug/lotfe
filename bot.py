@@ -751,7 +751,7 @@ async def continuous_monitor(app):
     from tracker import get_strong_outflow_alerts
     import time
 
-    log.info("Continuous monitor started FREE mode (interval=%ss, BSC+Base only)", MONITOR_INTERVAL_SEC)
+    log.info("Continuous monitor started FREE mode (interval=%ss, Ethereum Mainnet only)", MONITOR_INTERVAL_SEC)
     await asyncio.sleep(20)  # انتظار قصير بعد التشغيل
 
     while True:
@@ -854,7 +854,7 @@ def main():
         log.info("Continuous monitor + position manager started")
 
     app.post_init = post_init
-    log.info("Wallet tracker FREE mode (BSC+Base only)")
+    log.info("Wallet tracker FREE mode (Ethereum Mainnet only)")
     app.run_polling(drop_pending_updates=True, close_loop=False)
 
 

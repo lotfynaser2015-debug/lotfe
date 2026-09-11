@@ -1,14 +1,14 @@
 # Multi-Chain Wallet Tracker + MEXC Spot Bot
 
-بوت Telegram لمراقبة تحويلات التوكنات على **BSC + Base**، مع إمكانية شراء تلقائي على MEXC Spot عند ظهور فرص سحب جماعي.
+بوت Telegram لمراقبة تحويلات التوكنات على **Ethereum Mainnet**، مع إمكانية شراء تلقائي على MEXC Spot عند ظهور فرص سحب جماعي.
 
 ## العرض النظيف
 
 كل توكن يُعرض بهذا الشكل فقط:
 
 ```
-🥇 PEPE  BSC  ·  $12.4K  📊
-   └ كمية كبيرة · 28 تحويل نشط · BSC
+🥇 PEPE  Ethereum  ·  $12.4K  📊
+   └ كمية كبيرة · 28 تحويل نشط · Ethereum
 ```
 
 بدون ضجيج — التوكن + السبب فقط.
@@ -17,8 +17,7 @@
 
 | الشبكة | المصدر |
 |--------|--------|
-| BSC | Bloxroute + backup |
-| Base | Bloxroute + backup |
+| Ethereum Mainnet | Llama RPC + PublicNode backup |
 
 السعر والرمز من Dexscreener عند الحاجة.
 

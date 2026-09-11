@@ -164,7 +164,7 @@ def transfers_on_chain(chain_id, address, direction, minutes, cap=1200):
     latest = uint(latest_hex)
     bpm = cfg.get("blocks_per_min", 15)
     # Cap lookback so long windows (12h/24h) don't freeze the bot on free RPCs.
-    # ~12k blocks ≈ 10h BSC / ~6.5h Base — enough for opportunity scans.
+    # Ethereum Mainnet produces roughly 5 blocks per minute.
     max_blocks = 12000
     start = max(0, latest - min(max(1, int(minutes * bpm)), max_blocks))
     raw = defaultdict(lambda: {"raw_amount": 0, "count": 0})
@@ -483,8 +483,8 @@ def get_top_counterparties(minutes, wallets=None, chains=None):
     if wallets is None:
         import wallets as wm
         wallets = wm.get_all()
-    chain_id = "bsc"
-    if chains and "bsc" not in chains:
+    chain_id = "ethereum"
+    if chains and "ethereum" not in chains:
         chain_id = chains[0]
     own = {x.lower() for x in wallets.values()}
     peers = defaultdict(
@@ -546,12 +546,12 @@ def get_top_counterparties(minutes, wallets=None, chains=None):
     }
 
 
-def find_whales_for_token(token_address, chain_id="bsc", minutes=60, min_count=3, limit=15):
+def find_whales_for_token(token_address, chain_id="ethereum", minutes=60, min_count=3, limit=15):
     token = token_address.lower().strip()
     if not token.startswith("0x") or len(token) != 42:
         return {"error": "عنوان توكن غير صحيح", "whales": []}
     if chain_id not in CHAINS:
-        chain_id = "bsc"
+        chain_id = "ethereum"
 
     latest_hex = rpc(chain_id, "eth_blockNumber", [])
     if not latest_hex:
@@ -634,9 +634,9 @@ def get_usd_prices(items):
     for item in items:
         if isinstance(item, dict):
             contract = item.get("contract", "")
-            chain = item.get("chain", "bsc")
+            chain = item.get("chain", "ethereum")
         else:
-            contract, chain = str(item), "bsc"
+            contract, chain = str(item), "ethereum"
         key = contract.lower()
         cache_key = "%s:%s" % (chain, key)
         with _price_lock:
@@ -647,7 +647,7 @@ def get_usd_prices(items):
         try:
             response = requests.get(DEX + key, timeout=15)
             pairs = (response.json().get("pairs") or []) if response.status_code == 200 else []
-            dex_slug = CHAINS.get(chain, {}).get("dex", "bsc")
+            dex_slug = CHAINS.get(chain, {}).get("dex", "ethereum")
             preferred = [p for p in pairs if (p.get("chainId") or "").lower() == dex_slug]
             pick = preferred[0] if preferred else (pairs[0] if pairs else None)
             price = float(pick.get("priceUsd") or 0) if pick else 0
@@ -668,7 +668,7 @@ def get_strong_outflow_alerts(minutes=30, wallets=None, chains=None):
     """
     نسخة خفيفة مناسبة للـ Public RPCs:
     - يراقب عدد محدود من المحافظ بالتناوب
-    - BSC + Base فقط
+    - Ethereum Mainnet فقط
     - شروط سحب جماعي
     """
     global _cycle_index

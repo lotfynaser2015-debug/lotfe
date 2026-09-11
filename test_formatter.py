@@ -8,7 +8,7 @@ class FormatterV3Tests(unittest.TestCase):
     def report(self, count):
         contract = "0x" + "a" * 40
         item = {
-            "chain": "bsc",
+            "chain": "ethereum",
             "contract": contract,
             "symbol": "ABC",
             "name": "Alpha",
@@ -17,7 +17,7 @@ class FormatterV3Tests(unittest.TestCase):
             "score": 25.0,
             "reason": "نشاط",
         }
-        return {"_meta": {"chains": ["bsc"]}, "_combined": [item]}
+        return {"_meta": {"chains": ["ethereum"]}, "_combined": [item]}
 
     def test_less_than_three_transfers_are_hidden(self):
         contract = "0x" + "a" * 40

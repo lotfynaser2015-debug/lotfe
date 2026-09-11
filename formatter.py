@@ -24,19 +24,19 @@ def chain_label(cid):
 
 
 def dex_url(item):
-    cid = item.get("chain", "bsc")
-    slug = CHAINS.get(cid, {}).get("dex", "bsc")
+    cid = item.get("chain", "ethereum")
+    slug = CHAINS.get(cid, {}).get("dex", "ethereum")
     return "https://dexscreener.com/%s/%s" % (slug, safe(item.get("contract", "")))
 
 
 def explorer_token(item):
-    cid = item.get("chain", "bsc")
-    base = CHAINS.get(cid, {}).get("explorer", "https://bscscan.com")
+    cid = item.get("chain", "ethereum")
+    base = CHAINS.get(cid, {}).get("explorer", "https://etherscan.io")
     return "%s/token/%s" % (base, safe(item.get("contract", "")))
 
 
-def explorer_addr(address, chain="bsc"):
-    base = CHAINS.get(chain, {}).get("explorer", "https://bscscan.com")
+def explorer_addr(address, chain="ethereum"):
+    base = CHAINS.get(chain, {}).get("explorer", "https://etherscan.io")
     return "%s/address/%s" % (base, safe(address))
 
 
@@ -192,7 +192,7 @@ def format_discovery(data, minutes):
         a = x["addr"]
         return "<code>%s…%s</code>  %s تحويل  <a href=\"%s\">🔗</a>" % (
             esc(a[:6]), esc(a[-4:]), x.get("cnt_total", x.get("cnt_out", x.get("cnt_in", 0))),
-            explorer_addr(a, data.get("_meta", {}).get("chain", "bsc")),
+            explorer_addr(a, data.get("_meta", {}).get("chain", "ethereum")),
         )
 
     if data.get("top_withdrawers"):
@@ -218,7 +218,7 @@ def format_whales(data):
     if data.get("error"):
         return data["error"]
     symbol = data.get("symbol", "???")
-    chain = chain_label(data.get("chain", "bsc"))
+    chain = chain_label(data.get("chain", "ethereum"))
     minutes = data.get("minutes", 60)
     whales = data.get("whales", [])
     lines = [

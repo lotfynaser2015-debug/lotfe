@@ -28,26 +28,16 @@ TIME_PERIODS = [
     ("24 ساعة", 1440),
 ]
 
-# Bloxroute accepts wallet/topic-filtered eth_getLogs on the public endpoints.
-# The previous PublicNode/Dataseed endpoints returned provider restriction errors.
+# Ethereum Mainnet only. Both endpoints support the JSON-RPC calls used by the tracker.
 CHAINS = {
-    "bsc": {
-        "name": "BSC",
-        "rpc": "https://bsc.rpc.blxrbdn.com",
-        "rpc_backup": "https://bsc-dataseed1.binance.org",
-        "dex": "bsc",
-        "explorer": "https://bscscan.com",
-        "native": "BNB",
-        "blocks_per_min": 20,
-    },
-    "base": {
-        "name": "Base",
-        "rpc": "https://base.rpc.blxrbdn.com",
-        "rpc_backup": "https://base-rpc.publicnode.com",
-        "dex": "base",
-        "explorer": "https://basescan.org",
+    "ethereum": {
+        "name": "Ethereum",
+        "rpc": "https://eth.llamarpc.com",
+        "rpc_backup": "https://ethereum-rpc.publicnode.com",
+        "dex": "ethereum",
+        "explorer": "https://etherscan.io",
         "native": "ETH",
-        "blocks_per_min": 30,
+        "blocks_per_min": 5,
     },
 }
-ACTIVE_CHAINS = list(CHAINS.keys())
+ACTIVE_CHAINS = ["ethereum"]
