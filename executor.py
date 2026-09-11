@@ -51,6 +51,8 @@ def try_auto_buy(symbol, contract="", chain="", note="فرصة"):
     if not isinstance(order, dict):
         return False, f"فشل أمر الشراء: {order}"
     if order.get("error"):
+        if "غير مدعوم" in str(order.get("error")):
+            return False, f"⚠️ التنبيه وصل، لكن {pair} غير مدعوم للتداول على MEXC Spot"
         return False, f"فشل أمر الشراء: {order}"
     if order.get("code") and int(order.get("code", 0)) not in (0, 200):
         return False, f"فشل أمر الشراء: {order}"

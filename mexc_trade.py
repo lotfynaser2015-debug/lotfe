@@ -86,13 +86,14 @@ def _load_symbol_info(symbol: str):
     if symbol in _symbol_info:
         return _symbol_info[symbol]
     data = _request("GET", "/api/v3/exchangeInfo", {"symbol": symbol})
-    info = {"stepSize": 0.000001, "minQty": 0.0, "tickSize": 0.000001, "baseAsset": ""}
+    info = {"supported": False, "stepSize": 0.000001, "minQty": 0.0, "tickSize": 0.000001, "baseAsset": ""}
     try:
         symbols = data.get("symbols") or []
         if not symbols and data.get("symbol"):
             symbols = [data]
         for s in symbols:
             if s.get("symbol", "").upper() == symbol:
+                info["supported"] = str(s.get("status", "")).upper() in ("", "1", "ENABLED", "TRADING")
                 info["baseAsset"] = s.get("baseAsset", "")
                 for f in s.get("filters", []):
                     if f.get("filterType") == "LOT_SIZE":
@@ -146,12 +147,15 @@ def market_buy(symbol: str, quote_usd: float):
     if quote_usd < 1:
         return {"error": "amount too small", "min": 1}
 
-    # تحقق إن الزوج موجود وله سعر
+    info = _load_symbol_info(symbol)
+    if not info.get("supported"):
+        return {"error": f"زوج {symbol} غير مدعوم على MEXC Spot API"}
+
+    # تحقق إن للزوج سعرًا
     price = get_price(symbol)
     if price <= 0:
         return {"error": f"no price for {symbol} — may be delisted or not on MEXC spot"}
 
-    info = _load_symbol_info(symbol)
     # بعض الأزواج بتحتاج quantity بدل quoteOrderQty
     params = {
         "symbol": symbol,
