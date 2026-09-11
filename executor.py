@@ -54,6 +54,8 @@ def try_auto_buy(symbol, contract="", chain="", note="فرصة"):
         if "غير مدعوم" in str(order.get("error")):
             return False, f"⚠️ التنبيه وصل، لكن {pair} غير مدعوم للتداول على MEXC Spot"
         return False, f"فشل أمر الشراء: {order}"
+    if str(order.get("code", "")) == "10007" or "symbol not support" in str(order.get("msg", "")).lower():
+        return False, f"⚠️ التنبيه وصل، لكن {pair} غير مدعوم للتداول على MEXC Spot"
     if order.get("code") and int(order.get("code", 0)) not in (0, 200):
         return False, f"فشل أمر الشراء: {order}"
 

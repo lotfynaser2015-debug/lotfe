@@ -812,12 +812,14 @@ async def continuous_monitor(app):
                         chain=chain,
                         note="سحب جماعي",
                     )
-                    if ok or ("معطّل" not in buy_msg and "متوقف" not in buy_msg):
+                    if ok:
                         await app.bot.send_message(
                             chat_id=TELEGRAM_CHAT_ID,
                             text=buy_msg,
                             parse_mode="HTML",
                         )
+                    else:
+                        log.info("Auto-buy skipped: %s", buy_msg)
                 except Exception as e:
                     log.warning("Failed to send alert: %s", e)
 

@@ -10,7 +10,7 @@ TOP_N = 10
 MIN_TRANSFERS = 3
 # Continuous monitoring (free-friendly)
 MONITOR_INTERVAL_SEC = 300          # كل 5 دقايق
-ALERT_COOLDOWN_SEC = 1200           # 20 دقيقة cooldown لنفس التوكن
+ALERT_COOLDOWN_SEC = 3600           # ساعة cooldown لنفس التوكن
 MIN_WALLETS_FOR_ALERT = 1           # محفظة واحدة على الأقل
 MIN_SCORE_FOR_ALERT = 20000
 MAX_WALLETS_PER_CYCLE = 1           # محفظة واحدة في كل دورة لتجنب تجاوز حد RPC
