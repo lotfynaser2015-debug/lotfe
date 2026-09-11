@@ -25,6 +25,10 @@ def try_auto_buy(symbol, contract="", chain="", note="فرصة"):
     if open_count >= max_open:
         return False, f"وصلت لحد الصفقات المفتوحة ({open_count}/{max_open})"
 
+    normalized_symbol = str(symbol or "").upper().strip()
+    if trades_db.has_open_symbol(normalized_symbol):
+        return False, f"تخطي الشراء: صفقة {normalized_symbol} مفتوحة بالفعل"
+
     pair = mexc_trade.resolve_symbol(symbol)
     price = mexc_trade.get_price(pair)
     if price <= 0:
