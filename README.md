@@ -44,6 +44,8 @@
 - `TELEGRAM_BOT_TOKEN` (مطلوب)
 - `TELEGRAM_CHAT_ID` (موصى به)
 - `MEXC_API_KEY` / `MEXC_API_SECRET` (للتداول)
+- `ETHEREUM_RPC_URL` (اختياري — رابط RPC الأساسي)
+- `ETHEREUM_RPC_BACKUP_URL` (اختياري — رابط RPC الاحتياطي)
 - `DATABASE_URL` (PostgreSQL — الأفضل)
 - `SQLITE_DB_PATH` (اختياري — افتراضي `/data/trades.db` لو Volume موجود)
 

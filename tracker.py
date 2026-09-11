@@ -57,10 +57,16 @@ def rpc(chain_id, method, params):
                 timeout=8,
             )
             if r.status_code == 200:
-                result = r.json().get("result")
+                payload = r.json()
+                if payload.get("error"):
+                    log.debug("RPC %s returned error for %s: %s", chain_id, method, payload["error"].get("message", "unknown"))
+                    continue
+                result = payload.get("result")
                 if result is not None:
                     return result
-        except (requests.RequestException, ValueError, KeyError):
+            else:
+                log.debug("RPC endpoint returned HTTP %s for %s", r.status_code, chain_id)
+        except (requests.RequestException, ValueError, KeyError, TypeError):
             continue
     return None
 
@@ -177,7 +183,8 @@ def transfers_on_chain(chain_id, address, direction, minutes, cap=1200):
     raw = defaultdict(lambda: {"raw_amount": 0, "count": 0})
     processed = 0
     # Larger chunk size = fewer RPC round-trips on free endpoints
-    chunk = 2000
+    # Smaller ranges are accepted by more public Ethereum RPC providers.
+    chunk = 1000
     for end in range(latest, start - 1, -chunk):
         begin = max(start, end - (chunk - 1))
         for event in transfer_logs(chain_id, address, direction, begin, end):

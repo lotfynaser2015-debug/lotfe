@@ -2,6 +2,10 @@ import os
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+ETHEREUM_RPC_URL = os.getenv("ETHEREUM_RPC_URL", "https://eth.llamarpc.com").strip()
+ETHEREUM_RPC_BACKUP_URL = os.getenv(
+    "ETHEREUM_RPC_BACKUP_URL", "https://ethereum-rpc.publicnode.com"
+).strip()
 TOP_N = 10
 MIN_TRANSFERS = 3
 # Continuous monitoring (free-friendly)
@@ -32,8 +36,8 @@ TIME_PERIODS = [
 CHAINS = {
     "ethereum": {
         "name": "Ethereum",
-        "rpc": "https://eth.llamarpc.com",
-        "rpc_backup": "https://ethereum-rpc.publicnode.com",
+        "rpc": ETHEREUM_RPC_URL,
+        "rpc_backup": ETHEREUM_RPC_BACKUP_URL,
         "dex": "ethereum",
         "explorer": "https://etherscan.io",
         "native": "ETH",
