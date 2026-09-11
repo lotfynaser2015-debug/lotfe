@@ -757,12 +757,14 @@ async def continuous_monitor(app):
     while True:
         try:
             wallets = store.get_all()
-            if len(wallets) < 2:
+            if not wallets:
+                log.warning("Continuous monitor skipped: no wallets configured")
                 await asyncio.sleep(MONITOR_INTERVAL_SEC)
                 continue
 
             loop = asyncio.get_running_loop()
             alerts = await loop.run_in_executor(None, get_strong_outflow_alerts, 30, wallets)
+            log.info("Continuous monitor scanned %d wallet(s), found %d alert candidate(s)", len(wallets), len(alerts))
 
             now = time.time()
             for item in alerts:

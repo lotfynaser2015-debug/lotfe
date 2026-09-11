@@ -53,6 +53,15 @@ class TrackerV3Tests(unittest.TestCase):
         self.assertEqual(tracker.top_from_raw(self.sample(count=2)), [])
         self.assertEqual(len(tracker.top_from_raw(self.sample(count=3))), 1)
 
+    def test_strong_outflow_alert_allows_one_wallet(self):
+        wallets = {"Wallet": "0x" + "1" * 40}
+        raw = self.sample(count=4)
+        raw[next(iter(raw))]["score"] = 25000
+        with patch.object(tracker, "transfers_multi", return_value=raw):
+            alerts = tracker.get_strong_outflow_alerts(30, wallets, chains=["ethereum"])
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["wallet_count"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
