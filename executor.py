@@ -34,6 +34,10 @@ def try_auto_buy(symbol, contract="", chain="", note="فرصة"):
     if price <= 0:
         return False, f"مفيش سعر لـ {pair} على MEXC (قد تكون مش مدرجة)"
 
+    change_24h = mexc_trade.get_24h_change_percent(pair)
+    if change_24h is not None and change_24h > 5.0:
+        return False, f"تخطي الشراء: {pair} مرتفع {change_24h:+.2f}% خلال 24 ساعة (الحد +5%)"
+
     size = float(s["trade_size_usd"])
     balance = mexc_trade.get_balance("USDT")
     if balance < size:

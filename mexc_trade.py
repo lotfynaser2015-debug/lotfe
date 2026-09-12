@@ -70,6 +70,25 @@ def get_price(symbol: str) -> float:
         return 0.0
 
 
+def get_24h_change_percent(symbol: str):
+    """Return MEXC spot percentage change over the last 24 hours, or None."""
+    symbol = symbol.upper()
+    if not symbol.endswith("USDT"):
+        symbol = symbol + "USDT"
+    data = _request("GET", "/api/v3/ticker/24hr", {"symbol": symbol})
+    try:
+        value = data.get("priceChangePercent")
+        if value is not None:
+            return float(value)
+        open_price = float(data.get("openPrice") or 0)
+        last_price = float(data.get("lastPrice") or 0)
+        if open_price > 0 and last_price > 0:
+            return ((last_price - open_price) / open_price) * 100.0
+    except (AttributeError, TypeError, ValueError, ZeroDivisionError):
+        pass
+    return None
+
+
 def get_balance(asset: str = "USDT") -> float:
     data = _request("GET", "/api/v3/account", signed=True)
     if "balances" not in data:

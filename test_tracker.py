@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 
 import tracker
+import executor
 
 
 class TrackerV3Tests(unittest.TestCase):
@@ -61,6 +62,20 @@ class TrackerV3Tests(unittest.TestCase):
             alerts = tracker.get_strong_outflow_alerts(30, wallets, chains=["ethereum"])
         self.assertEqual(len(alerts), 1)
         self.assertEqual(alerts[0]["wallet_count"], 1)
+
+    def test_auto_buy_skips_daily_gainers(self):
+        with patch.object(executor.settings, "load", return_value={
+            "auto_buy_enabled": True,
+            "monitoring_enabled": True,
+            "max_open_trades": 3,
+            "trade_size_usd": 20,
+        }), patch.object(executor.trades_db, "count_open", return_value=0), \
+             patch.object(executor.trades_db, "has_open_symbol", return_value=False), \
+             patch.object(executor.mexc_trade, "get_price", return_value=1.0), \
+             patch.object(executor.mexc_trade, "get_24h_change_percent", return_value=5.1):
+            ok, message = executor.try_auto_buy("TEST")
+        self.assertFalse(ok)
+        self.assertIn("الحد +5%", message)
 
 
 if __name__ == "__main__":
