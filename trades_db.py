@@ -440,6 +440,15 @@ def close_trade(trade_id, close_price, note=""):
         return pnl
 
 
+def delete_trade(trade_id):
+    """Delete an open trade that is confirmed absent from the exchange balance."""
+    init()
+    with db() as (kind, c):
+        ph = "%s" if kind == "pg" else "?"
+        c.execute(f"DELETE FROM trades WHERE id={ph} AND status='open'", (trade_id,))
+        return c.rowcount if hasattr(c, "rowcount") else 0
+
+
 def mark_tp(trade_id, level):
     col = f"tp{level}_hit"
     with db() as (kind, c):

@@ -99,6 +99,20 @@ def get_balance(asset: str = "USDT") -> float:
     return 0.0
 
 
+def get_balance_checked(asset: str = "USDT"):
+    """Return balance, or None when the exchange account could not be read."""
+    data = _request("GET", "/api/v3/account", signed=True)
+    if not isinstance(data, dict) or "balances" not in data:
+        return None
+    for b in data["balances"]:
+        if b.get("asset", "").upper() == asset.upper():
+            try:
+                return float(b.get("free", 0))
+            except (TypeError, ValueError):
+                return None
+    return 0.0
+
+
 def _load_symbol_info(symbol: str):
     """Fetch lot size / step size for the symbol."""
     symbol = symbol.upper()

@@ -220,6 +220,24 @@ async def trade_selection_data(trades):
     return prices
 
 
+async def sync_open_trades_with_exchange():
+    """Remove open DB trades whose asset balance is confirmed to be zero."""
+    import mexc_trade
+
+    removed = 0
+    for trade in trades_db.get_open_trades():
+        pair = mexc_trade.resolve_symbol(trade.get("symbol", ""))
+        try:
+            balance = await asyncio.to_thread(mexc_trade.get_balance_checked, pair.replace("USDT", ""))
+        except Exception as exc:
+            log.warning("Could not sync trade #%s: %s", trade.get("id"), exc)
+            continue
+        if balance is not None and balance <= 1e-12:
+            removed += trades_db.delete_trade(trade["id"])
+            log.info("Removed trade #%s: no %s balance on MEXC", trade["id"], pair)
+    return removed
+
+
 def trade_selection_markup(trades, prices, selected):
     rows = []
     for trade in trades[:20]:
@@ -394,6 +412,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if data == "my_trades":
+        await sync_open_trades_with_exchange()
         trades = trades_db.get_open_trades()
         if not trades:
             await query.edit_message_text(
