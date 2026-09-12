@@ -112,7 +112,9 @@ def _load_symbol_info(symbol: str):
             symbols = [data]
         for s in symbols:
             if s.get("symbol", "").upper() == symbol:
-                info["supported"] = str(s.get("status", "")).upper() in ("", "1", "ENABLED", "TRADING")
+                status_ok = str(s.get("status", "")).upper() in ("", "1", "ENABLED", "TRADING")
+                spot_ok = s.get("isSpotTradingAllowed", True) is not False
+                info["supported"] = status_ok and spot_ok and "MARKET" in (s.get("orderTypes") or [])
                 info["baseAsset"] = s.get("baseAsset", "")
                 for f in s.get("filters", []):
                     if f.get("filterType") == "LOT_SIZE":
